@@ -389,7 +389,7 @@ nname := "mg_"+ files[0]
 
 
 func showfunc(){
-	fmt.Println("img_kit v1.0 2016 \n\nfunction: ")
+	fmt.Println("img_kit v1.0 2016.6 \n\nfunction: ")
 	fmt.Println("-1 changename")
 	fmt.Println("example: img_kit -1 source.jpg")
 	fmt.Println("-2 watermark")
