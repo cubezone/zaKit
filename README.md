@@ -15,5 +15,9 @@ example: img_kit -5 source.jpg source2.jpg ...<br>
 example: img_kit -6 . 400.jpg<br>
 
 #stc_kit
->stc_kit -1  600036 > 600036.txt
->stc_kit -2  600036.txt
+>stc_kit<br> 
+function:<br>
+-1  fetch data <br>
+example: stc_kit -1 600036 > 600036.txt <br>
+-2  cal macd  <br>
+example: stc_kit -2 600036.txt <br>
