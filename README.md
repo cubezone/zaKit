@@ -13,3 +13,7 @@ example: img_kit -4 source.png<br>
 example: img_kit -5 source.jpg source2.jpg ...<br>
 -6 merge dir suffix<br>
 example: img_kit -6 . 400.jpg<br>
+
+
+#stc_data 600036 > 600036.txt
+#stc_mac 600036.txt
