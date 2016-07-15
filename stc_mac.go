@@ -209,7 +209,7 @@ func main(){
     for index, cur := range arr {
     //    value.a = 12.3;
         //fmt.Println(cur)        
-        if (cur.BAR < -0.5 && cur.Kt < 15){
+        if (1 == 1 || cur.BAR < -0.5 && cur.Kt < 5){
         fmt.Printf("\n %s %s %6f %6f  \n",cur.stockid,cur.day ,cur.high,cur.low);
         fmt.Printf("arr[%4d]=%6f VALUE:%6f ,DEA :%6f ", index,  cur.EMA_12, cur.value,cur.DEA)
         fmt.Printf("DIFF:%6f  MACD:%6f\n ", cur.DIFF , cur.BAR)

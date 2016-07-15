@@ -106,7 +106,8 @@ func gethis( stockid string ,y string,q string){
 func main() {
 	todo := len(os.Args)
 	if (todo < 2 ){
-		fmt.Print("need id ");	
+		fmt.Print("need stock id, example stc_data 600036");	
+		fmt.Print("example: stc_data 600036");	
 		return 
 	}
 	stockid :=  os.Args[1]
