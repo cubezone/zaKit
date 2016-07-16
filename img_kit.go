@@ -198,6 +198,8 @@ func fresize(fname string){
     m := resize.Resize(wid, 0, img, resize.Lanczos3)
 
 	nname := strings.Replace(fname,".jpg", "."+os.Args[3]+".jpg", -1)
+	
+	if (nname != fname){
     out, err := os.Create(nname)
      if err != nil {
         log.Fatal(err)
@@ -208,6 +210,7 @@ func fresize(fname string){
     jpeg.Encode(out, m, nil)
 
     fmt.Println("resize OK!",nname)
+   }
 }
 
 
