@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"fmt"
@@ -197,7 +197,7 @@ func fresize(fname string){
 
     m := resize.Resize(wid, 0, img, resize.Lanczos3)
 
-	nname := strings.Replace(fname,".jpg", "."+os.Args[3]+".jpg", -1)
+	nname := strings.Replace(strings.ToLower(fname),".jpg", "."+os.Args[3]+".jpg", -1)
 	
 	if (nname != fname){
     out, err := os.Create(nname)
