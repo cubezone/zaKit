@@ -20,11 +20,11 @@ import (
 
 
 func ListDir(dirPth string, suffix string) (files []string, err error) {
- files = make([]string, 0, 10)
- dir, err := ioutil.ReadDir(dirPth)
- if err != nil {
-  return nil, err
- }
+	 files = make([]string, 0, 10)
+	 dir, err := ioutil.ReadDir(dirPth)
+	 if err != nil {
+	  return nil, err
+ 	}
  PthSep := string(os.PathSeparator)
  _ =PthSep
  suffix = strings.ToUpper(suffix) //忽略后缀匹配的大小写
