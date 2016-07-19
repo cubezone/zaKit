@@ -15,7 +15,7 @@ import (
 	"os"
 	"github.com/nfnt/resize"
 	"github.com/rwcarlsen/goexif/exif"
-	"github.com/rwcarlsen/goexif/mknote"	
+	"github.com/rwcarlsen/goexif/mknote"
 )
 
 func ListDir(dirPth string, suffix string) (files []string, err error) {
@@ -58,7 +58,7 @@ func WalkDir(dirPth, suffix string) (files []string, err error) {
 	return files, err
 }
 
-func changename(fname string){	
+func changename(fname string){
 	if (fname == ""){
 		fmt.Printf("need file")
 		return 
@@ -78,15 +78,15 @@ func changename(fname string){
 		fmt.Println("decode err",err)
 		return
 	}
-	f.Close() 
-	
+	f.Close()
+
 	camModel, _ := x.Get(exif.Model) // normally, don't ignore errors!
 	if camModel != nil {
 		fmt.Println(camModel.StringVal())
 	}else {
 		fmt.Printf(" camMode nil\n")
-	}	
-	
+	}
+
 	focal, _ := x.Get(exif.FocalLength)
 	if  focal != nil {
 		numer, denom, _ := focal.Rat2(0) // retrieve first (only) rat. value
@@ -113,7 +113,7 @@ func changename(fname string){
 
 	err = os.Rename(fname, newname)
 
-	if err != nil {  
+	if err != nil {
 		fmt.Println("file rename Error!",err.Error())
 	}else{
 		fmt.Println("file rename OK!")
@@ -164,14 +164,14 @@ func watermarkdir(dirpath string){
 	 fmt.Println("file ",ff)
 		watermark(ff)
 		}
- 	}
+	}
 }
 
 func fresize(fname string){
 	// open "test.jpg"	
 	if (fname == ""){
 		fmt.Printf("need file")
-		return 
+		return
 	}
 
 	file, err := os.Open(fname)
@@ -216,16 +216,16 @@ func fresizedir(dirpath string){
 	if (err == nil){
 	 for _,ff := range files {
 	 fmt.Println("file ",ff)
- 		fresize(ff)
- 		}
- 	}
+		fresize(ff)
+		}
+	}
 }
 
 func png2jpg(fname string){
 	// open "test.jpg"
 	if (fname == ""){
 		fmt.Printf("need file")
-		return 
+		return
 	}
 
 	file, err := os.Open(fname)
@@ -265,7 +265,7 @@ func png2jpgdir(dirpath string){
 
 func mergeimg(){
 	cnt := len(os.Args) - 2
-		
+
 	var b  image.Rectangle
 	var m draw.Image
 
@@ -284,7 +284,7 @@ func mergeimg(){
 		file.Close()
 
 		fmt.Println("decode file:",os.Args[i])
-		if (i == 2){			
+		if (i == 2){
 			b = image.Rect(0,0,(img.Bounds().Dx()+5)*2+5,(img.Bounds().Dy()+5)* (cnt/2)+5)
 			m = image.NewNRGBA(b)
 			draw.Draw(m, m.Bounds(), &image.Uniform{color.RGBA{200, 200, 200,255}}, image.ZP, draw.Src)
@@ -294,7 +294,7 @@ func mergeimg(){
 		offset := image.Pt(5+(img.Bounds().Dx()+5)* ((i-2)%2),5+(img.Bounds().Dy()+5)*(i-2-(i-2)%2)/2)
 
 		draw.Draw(m, img.Bounds().Add(offset), img, image.ZP, draw.Src)
-	}	
+	}
 
 	imgw, _ := os.Create("mg_"+os.Args[2])
 	jpeg.Encode(imgw, m, &jpeg.Options{95})
@@ -310,16 +310,16 @@ func mergeimgdir(dirpath string, suffix string){
 	if err != nil{
 		return
 	}
-	cnt := len(files) 
-		
+	cnt := len(files)
+
 	var b  image.Rectangle
 	var m draw.Image
 	y1,y2 := 5,5
 	maxy := 0
-	
+
 	for i := 0 ; i < cnt ; i++ {
 		fmt.Println("file ",files[i])
-		
+
 		file, err := os.Open(files[i])
 		if err != nil {
 		log.Fatal(err)
@@ -332,22 +332,22 @@ func mergeimgdir(dirpath string, suffix string){
 		}
 		file.Close()
 			fmt.Println("decode file:",files[i])
-		if y2 < y1 {			
-			y2 += img.Bounds().Dy()+5		
-		}else{					
-			y1 +=  img.Bounds().Dy()+5		
-		}	  	  
-	}	
+		if y2 < y1 {
+			y2 += img.Bounds().Dy()+5
+		}else{
+			y1 +=  img.Bounds().Dy()+5
+		}
+	}
 	if (y2 > y1 ){
 		maxy = y2
 	}else {
 		maxy = y1
 	}
-	 
+
 	y1,y2 = 5,5
 	for i := 0 ; i < cnt ; i++ {
 		fmt.Println("file ",files[i])
-		
+
 		file, err := os.Open(files[i])
 		if err != nil {
 		log.Fatal(err)
@@ -359,28 +359,28 @@ func mergeimgdir(dirpath string, suffix string){
 			log.Fatal(err)
 		}
 		file.Close()
-		
+
 		fmt.Println("decode file:",files[i])
-		if (i == 0){			
+		if (i == 0){
 			//b = image.Rect(0,0,(img.Bounds().Dx()+5)*2+5,(img.Bounds().Dy()+5)* ((cnt+1)/2)+5)
 			b = image.Rect(0,0,(img.Bounds().Dx()+5)*2+5,maxy)
 			m = image.NewNRGBA(b)
 			draw.Draw(m, m.Bounds(), &image.Uniform{color.RGBA{200, 200, 200,255}}, image.ZP, draw.Src)
 		}
-		
+
 		//offset := image.Pt(img.Bounds().Dx() , img.Bounds().Dy())
 		var offset image.Point
-		if y2 < y1 {			
-			offset = image.Pt(5+(img.Bounds().Dx()+5),y2)	
-			y2 += img.Bounds().Dy()+5		
-		}else{					
-			offset = image.Pt(5,y1)	
-			y1 +=  img.Bounds().Dy()+5		
+		if y2 < y1 {
+			offset = image.Pt(5+(img.Bounds().Dx()+5),y2)
+			y2 += img.Bounds().Dy()+5
+		}else{
+			offset = image.Pt(5,y1)
+			y1 +=  img.Bounds().Dy()+5
 		}
-	  
+
 		draw.Draw(m, img.Bounds().Add(offset), img, image.ZP, draw.Src)
-	}	
-	
+	}
+
 	nname := "mg_"+ files[0]
 	imgw, _ := os.Create(nname)
 	jpeg.Encode(imgw, m, &jpeg.Options{95})
@@ -411,7 +411,7 @@ func main() {
 	todo := len(os.Args)
 	if (todo < 2 ){
 		showfunc()
-		return 
+		return
 	}
 
 	if (os.Args[1] == "-1"){
