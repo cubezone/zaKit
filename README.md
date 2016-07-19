@@ -37,6 +37,3 @@ example: stc_kit -1 600036 > 600036.txt
 ```Bash
 example: stc_kit -2 600036.txt 
 ```
-author:
-		cubezone 2016.7
-.
