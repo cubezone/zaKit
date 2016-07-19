@@ -17,7 +17,7 @@ function:<br>
 #stc_kit
 stc_kit<br> 
 function:<br>
--1  fetch data <br>
+* -1  fetch data <br>
 		example: stc_kit -1 600036 > 600036.txt <br>
--2  cal macd  <br>
+* -2  cal macd  <br>
 		example: stc_kit -2 600036.txt <br>
