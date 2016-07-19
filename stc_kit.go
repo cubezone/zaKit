@@ -6,53 +6,53 @@ import (
 	"log"
 	"os"
 	"strconv"
-    "net/http"
-    "net/url"
-    "io/ioutil"
-    "bufio"
-    "io"
-    "strings"    
+	"net/http"
+	"net/url"
+	"io/ioutil"
+	"bufio"
+	"io"
+	"strings"
 )
 
 //指定代理ip
 func getTransportFieldURL(proxy_addr *string) (transport *http.Transport) {
-    url_i := url.URL{}
-    url_proxy, _ := url_i.Parse(*proxy_addr)
-    transport = &http.Transport{Proxy : http.ProxyURL(url_proxy)}
-    return
+	url_i := url.URL{}
+	url_proxy, _ := url_i.Parse(*proxy_addr)
+	transport = &http.Transport{Proxy : http.ProxyURL(url_proxy)}
+	return
 }
 //从环境变量$http_proxy或$HTTP_PROXY中获取HTTP代理地址
 func getTransportFromEnvironment() (transport *http.Transport) {
-    transport = &http.Transport{Proxy : http.ProxyFromEnvironment}
-    return
+	transport = &http.Transport{Proxy : http.ProxyFromEnvironment}
+	return
 }
 
 func fetch(url , proxy_addr *string) (html string) {
-    var client *http.Client
-    if *proxy_addr == "" {
-        client = &http.Client{}
-    }else{
-      transport := getTransportFieldURL(proxy_addr)
-      client = &http.Client{Transport : transport}
-    }
-    req, err := http.NewRequest("GET", *url, nil)
-    if err != nil {
-        log.Fatal(err.Error())
-    }
-    resp, err := client.Do(req)
-    if err != nil {
-        log.Fatal(err.Error())
-    } 
-    if resp.StatusCode == 200 {
-        robots, err := ioutil.ReadAll(resp.Body);
-        resp.Body.Close()
-        if err != nil {
-            log.Fatal(err.Error())
-        }
-        html = string(robots);
-    } else {
-        html = ""
-    }
+	var client *http.Client
+	if *proxy_addr == "" {
+		client = &http.Client{}
+	}else{
+	transport := getTransportFieldURL(proxy_addr)
+	client = &http.Client{Transport : transport}
+	}
+	req, err := http.NewRequest("GET", *url, nil)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err.Error())
+	} 
+	if resp.StatusCode == 200 {
+		robots, err := ioutil.ReadAll(resp.Body);
+		resp.Body.Close()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		html = string(robots);
+	} else {
+		html = ""
+	}
     return
 }
 
@@ -89,31 +89,29 @@ func gethis( stockid string ,y string,q string){
 	regdig := regexp.MustCompile(regdigtext)
 
 	for ind,tt := range ret {
-		if (ind % 7 == 0){			
-			if (ind != 0){ 
+		if (ind % 7 == 0){
+			if (ind != 0){
 				fmt.Println(" ");
 			}
 			fmt.Print(stockid+" ")
-		}		
+		}
 
 		rets := regdig.FindAllString(tt, -1)
-		
 		for _,tts := range rets {
 			fmt.Printf("%s", tts)
 		}
-		
-		fmt.Print(" ");	
+		fmt.Print(" ");
 	}
 }
 
 
 //对应json天气数据源的结构，头字母大写
-type dayvalue struct {    
+type dayvalue struct {
     stockid string
     day     string
     c       float64
     high    float64
-    low     float64    
+    low     float64
     value   float64
 
     EMA_12  float64
@@ -150,12 +148,12 @@ type dayvalue struct {
 
 func cal_macd(arr [] dayvalue , a int , b int){
 
-    var ee dayvalue 
+    var ee dayvalue
 
     arr[0].EMA_12,arr[0].EMA_26 = arr[0].value,arr[0].value
     fmt.Print(arr[0])
 
-    for index := 1; index < len(arr); index++ {   
+    for index := 1; index < len(arr); index++ {
      ee = arr[index]
      ee.EMA_12 = arr[index-1].EMA_12*float64(a-1)/float64(a+1) + ee.value*2/float64(a+1);
      ee.EMA_26 = arr[index-1].EMA_26*float64(b-1)/float64(b+1) + ee.value*2/float64(b+1);
@@ -187,7 +185,7 @@ func cal_macd(arr [] dayvalue , a int , b int){
     期调整跌势确立，这是一个常用的简单应用原则。
 */
 func cal_kdj(arr [] dayvalue,cnt int){
-     
+
     var ee dayvalue
     if (cnt > len(arr)){
         return
@@ -198,7 +196,7 @@ func cal_kdj(arr [] dayvalue,cnt int){
     var tt_high ,tt_low float64 = 0 , 0
 
     for index := 0; index < len(arr); index++ {
-        ee = arr[index] 
+        ee = arr[index]
         tt_high = arr[index].high
         tt_low = arr[index].low
         var a int
@@ -215,11 +213,11 @@ func cal_kdj(arr [] dayvalue,cnt int){
                 if arr[index-i].low < tt_low{
                     tt_low = arr[index-i].low
                 }
-            }       
+            }
         }
         ee.High_9 = tt_high
         ee.Low_9 = tt_low
-        
+
         arr[index] = ee;
     }
 
@@ -250,25 +248,25 @@ func arr_init(fn string)(arr [] dayvalue, err error) {
     f, err := os.Open(fn)//打开文件     
     defer f.Close() //打开文件出错处理     
     arr = make( [] dayvalue, 0, 30)
-    if nil != err {  
-      return arr,err       
+    if nil != err {
+      return arr,err
     }
     buff := bufio.NewReader(f) //读入缓存         
-    for { 
+    for {
         line, err := buff.ReadString('\n') //以'\n'为结束符读入一行    
-        if err != nil || io.EOF == err { 
-          break             
+        if err != nil || io.EOF == err {
+          break
         }
         //fmt.Print(line)  //可以对一行进行处理 
-        
-         rets := strings.Split(line," ")   
+
+         rets := strings.Split(line," ")
          if (len(rets)>5) {
-         var t dayvalue 
+         var t dayvalue
          t.stockid = rets[0]
          t.day = rets[1]
          // open,higt, close,low
          t.high,_ = strconv.ParseFloat(rets[3],3)
-         t.value,_ = strconv.ParseFloat(rets[4],3)         
+         t.value,_ = strconv.ParseFloat(rets[4],3)
          t.low,_ = strconv.ParseFloat(rets[5],3)
 
          //fmt.Println(t.value,t.high);
@@ -289,18 +287,18 @@ func main_mac(){
      arg_num := len(os.Args)
      if (arg_num <= 2 ){
          fmt.Println("require data file, C:\\php\\600887.txt " )
-         return        
+         return
      }else{
         fname = os.Args[2]
      }
-  
+
     //fname = "C:\\php\\600887.txt"
-  
-    arr, err := arr_init(fname) 
+
+    arr, err := arr_init(fname)
     if (err !=  nil){
         fmt.Println("can't open ", fname)
-        return 
-    } 
+        return
+    }
 
     cal_macd(arr,12,26)
 
@@ -315,24 +313,22 @@ func main_mac(){
         fmt.Printf("DIFF:%6f  MACD:%6f\n ", cur.DIFF , cur.BAR)
         fmt.Printf("RSV:%6f,value:%6f ,high9:%6f, low9: %6f ,K:%6f ,D:%6f  J:%6f\n",cur.RSV,cur.value,cur.High_9, cur.Low_9, cur.Kt, cur.Dt,cur.Jt)
         }
-        
     }
 }
 
 func main_data() {
 	todo := len(os.Args)
 	if (todo < 3 ){
-		fmt.Print("need stock id, example stc_data 600036");	
-		fmt.Print("example: stc_data 600036");	
-		return 
+		fmt.Print("need stock id, example stc_data 600036")
+		fmt.Print("example: stc_data 600036")
+		return
 	}
 	stockid :=  os.Args[2]
 	//gethis("600036","2016","2")
-	
 	for n := 2016; n>=2010 ; n-- {
-		for m := 4; m>=1; m-- { 
+		for m := 4; m>=1; m-- {
 			gethis(stockid,strconv.Itoa(n),strconv.Itoa(m))
-			fmt.Print("\n");	
+			fmt.Print("\n")
 		}
 	}
 }
@@ -342,15 +338,15 @@ func main(){
 	if (todo <= 2 ){
         fmt.Println("stc_kit version 1.0 @2016\n")
 		fmt.Println("stc_kit get data")
-		fmt.Println("stc_kit -1 600036 > 600036.txt");	
+		fmt.Println("stc_kit -1 600036 > 600036.txt")
 		fmt.Println("stc_kit cal mac")
-		fmt.Println("stc_kit -2 600036.txt");	
-		return 
+		fmt.Println("stc_kit -2 600036.txt")
+		return
 	}
 	if (os.Args[1] == "-1"){
 		main_data()
     }
 	if (os.Args[1] == "-2"){
-		main_mac()	
+		main_mac()
     }
 }
