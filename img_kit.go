@@ -18,24 +18,23 @@ import (
 	"github.com/rwcarlsen/goexif/mknote"	
 )
 
-
 func ListDir(dirPth string, suffix string) (files []string, err error) {
 	 files = make([]string, 0, 10)
 	 dir, err := ioutil.ReadDir(dirPth)
 	 if err != nil {
 	  return nil, err
- 	}
- 	PthSep := string(os.PathSeparator)
+	}
+	PthSep := string(os.PathSeparator)
 	_ =PthSep
 	suffix = strings.ToUpper(suffix) //忽略后缀匹配的大小写
- 	for _, fi := range dir {
-  		if fi.IsDir() { // 忽略目录
-   			continue
-  		}
-  		if strings.HasSuffix(strings.ToUpper(fi.Name()), suffix) { //匹配文件
-   		//files = append(files, dirPth+PthSep+fi.Name())
-   		files = append(files, fi.Name())
-  		}
+	for _, fi := range dir {
+		if fi.IsDir() { // 忽略目录
+			continue
+		}
+		if strings.HasSuffix(strings.ToUpper(fi.Name()), suffix) { //匹配文件
+		//files = append(files, dirPth+PthSep+fi.Name())
+		files = append(files, fi.Name())
+		}
 	}
 	return files, nil
 }
@@ -45,18 +44,18 @@ func WalkDir(dirPth, suffix string) (files []string, err error) {
 	files = make([]string, 0, 30)
 	suffix = strings.ToUpper(suffix) //忽略后缀匹配的大小写
 	err = filepath.Walk(dirPth, func(filename string, fi os.FileInfo, err error) error { //遍历目录
-  	//if err != nil { //忽略错误
-  	// return err
-  	//}
-  	if fi.IsDir() { // 忽略目录
-   		return nil
-  	}
-  	if strings.HasSuffix(strings.ToUpper(fi.Name()), suffix) {
-   		files = append(files, filename)
-  	}
-  	return nil
- 	})
- 	return files, err
+	//if err != nil { //忽略错误
+	// return err
+	//}
+	if fi.IsDir() { // 忽略目录
+		return nil
+	}
+	if strings.HasSuffix(strings.ToUpper(fi.Name()), suffix) {
+		files = append(files, filename)
+	}
+	return nil
+	})
+	return files, err
 }
 
 func changename(fname string){	
@@ -105,57 +104,57 @@ func changename(fname string){
 
 	newname := "IMG_"+strings.Replace(tm.Format("20060102_150405"), ":", "-", -1)+".jpg"
 	_ , err = os.Stat(newname)
- 	if err == nil {
-          fmt.Println("file exist!")
-          return
-    }
+	if err == nil {
+		fmt.Println("file exist!")
+		return
+	}
 
-    fmt.Println("oname ",fname,"nname ",newname)
-    
+	fmt.Println("oname ",fname,"nname ",newname)
+
 	err = os.Rename(fname, newname)
-	
+
 	if err != nil {  
 		fmt.Println("file rename Error!",err.Error())
 	}else{
- 	   fmt.Println("file rename OK!")
+		fmt.Println("file rename OK!")
 	}
 }
 
 func changenamedir(dirpath string){
 	files, err :=  ListDir(dirpath,".jpg")
 	if (err == nil){
-	 for _,ff := range files {
-	 fmt.Println("file ",ff)
- 		changename(ff)
- 		}
- 	}
+		for _,ff := range files {
+			fmt.Println("file ",ff)
+			changename(ff)
+		}
+	}
 }
 
-func watermark(fname string){  //原始图片是sam.jpg    
-    imgb, _ := os.Open(fname)
-    img, _ := jpeg.Decode(imgb)
-    defer imgb.Close()
+func watermark(fname string){  //原始图片是sam.jpg\t
+	imgb, _ := os.Open(fname)
+	img, _ := jpeg.Decode(imgb)
+	defer imgb.Close()
 
-    wmb, _ := os.Open(os.Args[3])
-    watermark, _ := png.Decode(wmb)
-    defer wmb.Close()
+	wmb, _ := os.Open(os.Args[3])
+	watermark, _ := png.Decode(wmb)
+	defer wmb.Close()
 
-    //把水印写到右下角，并向0坐标各偏移10个像素
-    offset := image.Pt(img.Bounds().Dx()-watermark.Bounds().Dx()-10, img.Bounds().Dy()-watermark.Bounds().Dy()-10 +100)
-    //b := img.Bounds()
-    b :=  image.Rect(0,0,img.Bounds().Dx(),img.Bounds().Dy()+80)
-    m := image.NewNRGBA(b)
+	//把水印写到右下角，并向0坐标各偏移10个像素
+	offset := image.Pt(img.Bounds().Dx()-watermark.Bounds().Dx()-10, img.Bounds().Dy()-watermark.Bounds().Dy()-10 +100)
+	//b := img.Bounds()
+	b :=  image.Rect(0,0,img.Bounds().Dx(),img.Bounds().Dy()+80)
+	m := image.NewNRGBA(b)
 
-    draw.Draw(m, b, img, image.ZP, draw.Src)
-    draw.Draw(m, watermark.Bounds().Add(offset), watermark, image.ZP, draw.Over)
+	draw.Draw(m, b, img, image.ZP, draw.Src)
+	draw.Draw(m, watermark.Bounds().Add(offset), watermark, image.ZP, draw.Over)
 
-    //生成新图片new.jpg，并设置图片质量..
-    imgw, _ := os.Create("wt_"+fname)
-    jpeg.Encode(imgw, m, &jpeg.Options{95})
+	//生成新图片new.jpg，并设置图片质量..
+	imgw, _ := os.Create("wt_"+fname)
+	jpeg.Encode(imgw, m, &jpeg.Options{95})
 
-    defer imgw.Close()
+	defer imgw.Close()
 
-    fmt.Println("output ","wt_"+fname)
+	fmt.Println("output ","wt_"+fname)
 }
 
 func watermarkdir(dirpath string){
@@ -163,53 +162,52 @@ func watermarkdir(dirpath string){
 	if (err == nil){
 	 for _,ff := range files {
 	 fmt.Println("file ",ff)
- 		watermark(ff)
- 		}
+		watermark(ff)
+		}
  	}
 }
 
-
 func fresize(fname string){
-	// open "test.jpg"    
-    if (fname == ""){
-        fmt.Printf("need file")
-        return 
-    }
+	// open "test.jpg"	
+	if (fname == ""){
+		fmt.Printf("need file")
+		return 
+	}
 
-    file, err := os.Open(fname)
-    if err != nil {
-        log.Fatal(err)
-    }
+	file, err := os.Open(fname)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    // decode jpeg into image.Image
-    img, err := jpeg.Decode(file)
-    if err != nil {
-        fmt.Printf("decode file err")
-        log.Fatal(err)
-    }
-    file.Close()
+	// decode jpeg into image.Image
+	img, err := jpeg.Decode(file)
+	if err != nil {
+		fmt.Printf("decode file err")
+		log.Fatal(err)
+	}
+	file.Close()
 
-    // resize to width 1000 using Lanczos resampling
-    // and preserve aspect ratio
-    tw, _ := strconv.Atoi(os.Args[3])
-    wid := uint(tw)
+	// resize to width 1000 using Lanczos resampling
+	// and preserve aspect ratio
+	tw, _ := strconv.Atoi(os.Args[3])
+	wid := uint(tw)
 
-    m := resize.Resize(wid, 0, img, resize.Lanczos3)
+	m := resize.Resize(wid, 0, img, resize.Lanczos3)
 
 	nname := strings.Replace(strings.ToLower(fname),".jpg", "."+os.Args[3]+".jpg", -1)
 
 	if (nname != fname){
-    out, err := os.Create(nname)
-     if err != nil {
-        log.Fatal(err)
-    }
-    defer out.Close()
+	out, err := os.Create(nname)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer out.Close()
 
-    // write new image to file
-    jpeg.Encode(out, m, nil)
+	// write new image to file
+	jpeg.Encode(out, m, nil)
 
-    fmt.Println("resize OK!",nname)
-   }
+	fmt.Println("resize OK!",nname)
+	}
 }
 
 
@@ -225,34 +223,34 @@ func fresizedir(dirpath string){
 
 func png2jpg(fname string){
 	// open "test.jpg"
-    if (fname == ""){
-        fmt.Printf("need file")
-        return 
-    }
+	if (fname == ""){
+		fmt.Printf("need file")
+		return 
+	}
 
-    file, err := os.Open(fname)
-    if err != nil {
-        log.Fatal(err)
-    }
+	file, err := os.Open(fname)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    // decode png into image.Image
-    img, err := png.Decode(file)
-    if err != nil {
-        fmt.Printf("decode file err")
-        log.Fatal(err)
-    }
-    file.Close()
+	// decode png into image.Image
+	img, err := png.Decode(file)
+	if err != nil {
+		fmt.Printf("decode file err")
+		log.Fatal(err)
+	}
+	file.Close()
 
-    // encode jpeg into jpeg file
-    out, err := os.Create(fname+".jpg")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer out.Close()
+	// encode jpeg into jpeg file
+	out, err := os.Create(fname+".jpg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer out.Close()
 
-    jpeg.Encode(out, img, nil)
+	jpeg.Encode(out, img, nil)
 
-    fmt.Println("png2jpg OK!",fname+".jpg")
+	fmt.Println("png2jpg OK!",fname+".jpg")
 }
 
 func png2jpgdir(dirpath string){
@@ -260,9 +258,9 @@ func png2jpgdir(dirpath string){
 	if (err == nil){
 	 for _,ff := range files {
 	 fmt.Println("file ",ff)
- 		png2jpg(ff)
- 		}
- 	}
+		png2jpg(ff)
+		}
+	}
 }
 
 func mergeimg(){
@@ -274,43 +272,44 @@ func mergeimg(){
 	for i := 2 ; i <= cnt+1 ; i++ {
 
 		file, err := os.Open(os.Args[i])
-    	if err != nil {
-        log.Fatal(err)
-   		}
+		if err != nil {
+		log.Fatal(err)
+		}
 
-   		img, err := jpeg.Decode(file)
-	    if err != nil {
-	        fmt.Printf("decode file err")
-	        log.Fatal(err)
-	    }
-	    file.Close()
+		img, err := jpeg.Decode(file)
+		if err != nil {
+			fmt.Printf("decode file err")
+			log.Fatal(err)
+		}
+		file.Close()
+
 		fmt.Println("decode file:",os.Args[i])
-	    if (i == 2){			
+		if (i == 2){			
 			b = image.Rect(0,0,(img.Bounds().Dx()+5)*2+5,(img.Bounds().Dy()+5)* (cnt/2)+5)
 			m = image.NewNRGBA(b)
 			draw.Draw(m, m.Bounds(), &image.Uniform{color.RGBA{200, 200, 200,255}}, image.ZP, draw.Src)
-	    }
+		}
 
-	    //offset := image.Pt(img.Bounds().Dx() , img.Bounds().Dy())
-	    offset := image.Pt(5+(img.Bounds().Dx()+5)* ((i-2)%2),5+(img.Bounds().Dy()+5)*(i-2-(i-2)%2)/2)
+		//offset := image.Pt(img.Bounds().Dx() , img.Bounds().Dy())
+		offset := image.Pt(5+(img.Bounds().Dx()+5)* ((i-2)%2),5+(img.Bounds().Dy()+5)*(i-2-(i-2)%2)/2)
 
-	    draw.Draw(m, img.Bounds().Add(offset), img, image.ZP, draw.Src)
+		draw.Draw(m, img.Bounds().Add(offset), img, image.ZP, draw.Src)
 	}	
 
 	imgw, _ := os.Create("mg_"+os.Args[2])
-    jpeg.Encode(imgw, m, &jpeg.Options{95})
+	jpeg.Encode(imgw, m, &jpeg.Options{95})
 
-    defer imgw.Close()
+	defer imgw.Close()
 
-    fmt.Println("output merge file:","mg_"+os.Args[2])
+	fmt.Println("output merge file:","mg_"+os.Args[2])
 }
 
 func mergeimgdir(dirpath string, suffix string){
 
 	files, err :=  ListDir(dirpath,suffix)
- 	if err != nil{
- 		return
- 	}
+	if err != nil{
+		return
+	}
 	cnt := len(files) 
 		
 	var b  image.Rectangle
@@ -322,71 +321,73 @@ func mergeimgdir(dirpath string, suffix string){
 		fmt.Println("file ",files[i])
 		
 		file, err := os.Open(files[i])
-    	if err != nil {
-        log.Fatal(err)
-   		}
+		if err != nil {
+		log.Fatal(err)
+		}
 
-   		img, err := jpeg.Decode(file)
-	    if err != nil {
-	        fmt.Printf("decode file err")
-	        log.Fatal(err)
-	    }
-	    file.Close()
+		img, err := jpeg.Decode(file)
+		if err != nil {
+			fmt.Printf("decode file err")
+			log.Fatal(err)
+		}
+		file.Close()
 			fmt.Println("decode file:",files[i])
-	    if y2 < y1 {	    	
-	    	y2 += img.Bounds().Dy()+5	    
-	    }else{	    	    	
-	    	y1 +=  img.Bounds().Dy()+5	    
-	    }	  	  
+		if y2 < y1 {			
+			y2 += img.Bounds().Dy()+5		
+		}else{					
+			y1 +=  img.Bounds().Dy()+5		
+		}	  	  
 	}	
 	if (y2 > y1 ){
-	 maxy = y2
-	 }else {
-	 maxy = y1
-	 }
+		maxy = y2
+	}else {
+		maxy = y1
+	}
 	 
-		y1,y2 = 5,5
+	y1,y2 = 5,5
 	for i := 0 ; i < cnt ; i++ {
 		fmt.Println("file ",files[i])
 		
 		file, err := os.Open(files[i])
-    	if err != nil {
-        log.Fatal(err)
-   		}
+		if err != nil {
+		log.Fatal(err)
+		}
 
-   		img, err := jpeg.Decode(file)
-	    if err != nil {
-	        fmt.Printf("decode file err")
-	        log.Fatal(err)
-	    }
-	    file.Close()
-			fmt.Println("decode file:",files[i])
-	    if (i == 0){			
+		img, err := jpeg.Decode(file)
+		if err != nil {
+			fmt.Printf("decode file err")
+			log.Fatal(err)
+		}
+		file.Close()
+		
+		fmt.Println("decode file:",files[i])
+		if (i == 0){			
 			//b = image.Rect(0,0,(img.Bounds().Dx()+5)*2+5,(img.Bounds().Dy()+5)* ((cnt+1)/2)+5)
 			b = image.Rect(0,0,(img.Bounds().Dx()+5)*2+5,maxy)
 			m = image.NewNRGBA(b)
 			draw.Draw(m, m.Bounds(), &image.Uniform{color.RGBA{200, 200, 200,255}}, image.ZP, draw.Src)
-	    }
-	    
-	    //offset := image.Pt(img.Bounds().Dx() , img.Bounds().Dy())
-	    var offset image.Point
-	    if y2 < y1 {	    	
-	    	offset = image.Pt(5+(img.Bounds().Dx()+5),y2)	
-	    	y2 += img.Bounds().Dy()+5	    
-	    }else{	    	    	
-	    	offset = image.Pt(5,y1)	
-	    	y1 +=  img.Bounds().Dy()+5	    
-	    }
+		}
+		
+		//offset := image.Pt(img.Bounds().Dx() , img.Bounds().Dy())
+		var offset image.Point
+		if y2 < y1 {			
+			offset = image.Pt(5+(img.Bounds().Dx()+5),y2)	
+			y2 += img.Bounds().Dy()+5		
+		}else{					
+			offset = image.Pt(5,y1)	
+			y1 +=  img.Bounds().Dy()+5		
+		}
 	  
-	    draw.Draw(m, img.Bounds().Add(offset), img, image.ZP, draw.Src)
+		draw.Draw(m, img.Bounds().Add(offset), img, image.ZP, draw.Src)
 	}	
-nname := "mg_"+ files[0]
-	  imgw, _ := os.Create(nname)
-    jpeg.Encode(imgw, m, &jpeg.Options{95})
+	
+	nname := "mg_"+ files[0]
+	imgw, _ := os.Create(nname)
+	jpeg.Encode(imgw, m, &jpeg.Options{95})
 
-    defer imgw.Close()
+	defer imgw.Close()
 
-    fmt.Println("output merge file:",nname)
+	fmt.Println("output merge file:",nname)
 }
 
 
