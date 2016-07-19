@@ -13,3 +13,9 @@ git commit -m "注释语句"
 
 git push -u origin master
 
+$ git pull
+Pull is not possible because you have unmerged files.
+Please, fix them up in the work tree, and then use 'git add/rm <file>'
+as appropriate to mark resolution, or use 'git commit -a'
+
+git reset --hard FETCH_HEAD
