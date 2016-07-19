@@ -2,7 +2,7 @@
 img_kit v1.0 2016<br>
 function:<br>
 -1 changename<br>
-		example: img_kit -1 source.jpg<br>
+###		example: img_kit -1 source.jpg<br>
 -2 watermark<br>
 		example: img_kit -2 source.jpg water.png<br>
 -3 resize<br>
