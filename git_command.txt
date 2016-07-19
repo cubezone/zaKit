@@ -1,0 +1,15 @@
+﻿
+download https://git-scm.com/download/win
+
+git init 
+git add .
+git commit -m "注释语句"
+git remote add origin https://github.com/cubezone/zakit
+git pull origin master
+
+git add .
+git rm  
+git commit -m "注释语句"
+
+git push -u origin master
+

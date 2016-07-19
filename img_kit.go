@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"fmt"
@@ -20,11 +20,11 @@ import (
 
 
 func ListDir(dirPth string, suffix string) (files []string, err error) {
- files = make([]string, 0, 10)
- dir, err := ioutil.ReadDir(dirPth)
- if err != nil {
-  return nil, err
- }
+	 files = make([]string, 0, 10)
+	 dir, err := ioutil.ReadDir(dirPth)
+	 if err != nil {
+	  return nil, err
+ 	}
  PthSep := string(os.PathSeparator)
  _ =PthSep
  suffix = strings.ToUpper(suffix) //忽略后缀匹配的大小写
@@ -197,7 +197,9 @@ func fresize(fname string){
 
     m := resize.Resize(wid, 0, img, resize.Lanczos3)
 
-	nname := strings.Replace(fname,".jpg", "."+os.Args[3]+".jpg", -1)
+	nname := strings.Replace(strings.ToLower(fname),".jpg", "."+os.Args[3]+".jpg", -1)
+
+	if (nname != fname){
     out, err := os.Create(nname)
      if err != nil {
         log.Fatal(err)
@@ -208,6 +210,7 @@ func fresize(fname string){
     jpeg.Encode(out, m, nil)
 
     fmt.Println("resize OK!",nname)
+   }
 }
 
 
