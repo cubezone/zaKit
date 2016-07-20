@@ -60,6 +60,8 @@ func gethis( stockid string ,y string,q string){
 	proxy_addr := ""
     url := "http://money.finance.sina.com.cn/corp/go.php/vMS_MarketHistory/stockid/"+stockid+".phtml?year="+y+"&jidu="+q;
     html := fetch(&url, &proxy_addr)
+
+//数据例子
 /*
 	text := "<td><div align=\"center\">17.980</div></td>'"
 	text += "<td><div align=\"center\">18.980</div></td>'"
