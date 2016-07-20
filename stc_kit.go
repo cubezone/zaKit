@@ -88,6 +88,7 @@ func gethis( stockid string ,y string,q string){
 
 	regdig := regexp.MustCompile(regdigtext)
 
+    //信息解码， 每7行 为一组信息，最终转换为一行。
 	for ind,tt := range ret {
 		if (ind % 7 == 0){
 			if (ind != 0){
@@ -96,6 +97,7 @@ func gethis( stockid string ,y string,q string){
 			fmt.Print(stockid+" ")
 		}
 
+        //数字解码：日期，价格，
 		rets := regdig.FindAllString(tt, -1)
 		for _,tts := range rets {
 			fmt.Printf("%s", tts)
@@ -325,7 +327,7 @@ func main_data() {
 	}
 	stockid :=  os.Args[2]
 	//gethis("600036","2016","2")
-	for n := 2016; n>=2010 ; n-- {
+	for n := 2016; n>=2015 ; n-- {
 		for m := 4; m>=1; m-- {
 			gethis(stockid,strconv.Itoa(n),strconv.Itoa(m))
 			fmt.Print("\n")
