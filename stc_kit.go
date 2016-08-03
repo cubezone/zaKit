@@ -9,6 +9,9 @@ import (
 	"net/http"
 	"net/url"
 	"io/ioutil"
+    "image"
+    "image/color"
+    "image/png"
 	"bufio"
 	"io"
 	"strings"
@@ -285,7 +288,7 @@ func arr_init(fn string)(arr [] dayvalue, err error) {
 }
 
 
-func main_mac(){
+func main_mac(show int)(oarr [] dayvalue, oerr error){
 
      var fname string
      arg_num := len(os.Args)
@@ -307,16 +310,61 @@ func main_mac(){
     cal_macd(arr,12,26)
 
     cal_kdj(arr,9)
+    if (show == 1 ){
 
-    for index, cur := range arr {
-    //    value.a = 12.3;
-        //fmt.Println(cur)        
-        if (1 == 1 || cur.BAR < -0.5 && cur.Kt < 5){
-        fmt.Printf("\n %s %s %6f %6f  \n",cur.stockid,cur.day ,cur.high,cur.low);
-        fmt.Printf("arr[%4d]=%6f VALUE:%6f ,DEA :%6f ", index,  cur.EMA_12, cur.value,cur.DEA)
-        fmt.Printf("DIFF:%6f  MACD:%6f\n ", cur.DIFF , cur.BAR)
-        fmt.Printf("RSV:%6f,value:%6f ,high9:%6f, low9: %6f ,K:%6f ,D:%6f  J:%6f\n",cur.RSV,cur.value,cur.High_9, cur.Low_9, cur.Kt, cur.Dt,cur.Jt)
+        for index, cur := range arr {
+        //    value.a = 12.3;
+            //fmt.Println(cur)        
+            if (1 == 1 || cur.BAR < -0.5 && cur.Kt < 5){
+            fmt.Printf("\n %s %s %6f %6f  \n",cur.stockid,cur.day ,cur.high,cur.low);
+            fmt.Printf("arr[%4d]=%6f VALUE:%6f ,DEA :%6f ", index,  cur.EMA_12, cur.value,cur.DEA)
+            fmt.Printf("DIFF:%6f  MACD:%6f\n ", cur.DIFF , cur.BAR)
+            fmt.Printf("RSV:%6f,value:%6f ,high9:%6f, low9: %6f ,K:%6f ,D:%6f  J:%6f\n",cur.RSV,cur.value,cur.High_9, cur.Low_9, cur.Kt, cur.Dt,cur.Jt)
+            }
         }
+    }
+    return arr, err
+}
+
+func draw_png(arr [] dayvalue){
+    const (
+        dx = 1600
+        dy = 800
+    )
+    var ee dayvalue
+    
+    imgfile, _ := os.Create(fmt.Sprintf("%s.png", os.Args[2]))
+    defer imgfile.Close()
+    img := image.NewNRGBA(image.Rect(0, 0, dx, dy))
+    
+ /*   for x := 0; x <= dx; x++ {
+        img.Set(x, dy/2, color.RGBA{uint8(x % 256), uint8(x % 256), 0, 255})
+    }
+    */
+    var la,lb,lc int
+
+    for index := 0; index < len(arr); index++ {
+        if (index == 0) {
+            la,lb,lc = int(ee.Kt)*2,int(ee.Dt)*2,int(ee.Jt)*2
+        }
+        ee = arr[index]
+        zoom := 3
+        if (index > 0){
+            drawline((index-1)*zoom,la,index*zoom,int(ee.Kt)*zoom, func(x, y int) {  
+                img.Set(x,y,color.RGBA{255, 0, 0, 255})})               
+            drawline((index-1)*zoom,lb,index*zoom,int(ee.Dt)*zoom, func(x, y int) {  
+                img.Set(x,y,color.RGBA{255, 255, 0, 255})}) 
+            drawline((index-1)*zoom,lc,index*zoom,int(ee.Jt)*zoom, func(x, y int) {  
+                img.Set(x,y,color.RGBA{0, 255, 0, 255})})  
+           
+        }
+        la,lb,lc = int(ee.Kt),int(ee.Dt),int(ee.Jt)
+        la,lb,lc = la*zoom,lb*zoom,lc*zoom
+    }
+
+    err := png.Encode(imgfile, img)
+    if err != nil {
+        log.Fatal(err)
     }
 }
 
@@ -337,6 +385,64 @@ func main_data() {
 	}
 }
 
+// Putpixel describes a function expected to draw a point on a bitmap at (x, y) coordinates.
+type Putpixel func(x ,y int)
+
+func abs(x int) int {
+    if x >= 0 {
+        return x
+    }
+    return -x
+}
+
+// Bresenham's algorithm, http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+// TODO: handle int overflow etc.
+func drawline( x0, y0, x1, y1 int, brush Putpixel) {
+    dx := abs(x1 - x0)
+    dy := abs(y1 - y0)
+    sx, sy := 1, 1
+    if x0 >= x1 {
+        sx = -1
+    }
+    if y0 >= y1 {
+        sy = -1
+    }
+    err := dx - dy
+
+    for {
+        brush(x0, y0)
+        if x0 == x1 && y0 == y1 {
+            return
+        }
+        e2 := err * 2
+        if e2 > -dy {
+            err -= dy
+            x0 += sx
+        }
+        if e2 < dx {
+            err += dx
+            y0 += sy
+        }
+    }
+}
+
+// DrawPolyline is a simple function for drawing a series of rasterized lines,
+// connecting the points specified in pts (treated as a closed polygon).
+// This function uses a very basic implementation of the Bresenham's algorithm
+// (http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm),
+// thus with no antialiasing. Moreover, the coordinates of the nodes are rounded
+// down towards the nearest integer.
+// The computed points are passed to brush function for final rendering.
+/*
+func DrawPolyline(pts []polyclip.Point, brush Putpixel) {
+    last := len(pts) - 1
+    for i := 0; i < len(pts); i++ {
+        drawline(int(pts[last].X), int(pts[last].Y), int(pts[i].X), int(pts[i].Y), brush)
+        last = i
+    }
+}
+*/
+
 func main(){
 	todo := len(os.Args)
 	if (todo <= 2 ){
@@ -345,12 +451,18 @@ func main(){
 		fmt.Println("stc_kit -1 600036 > 600036.txt")
 		fmt.Println("stc_kit cal mac")
 		fmt.Println("stc_kit -2 600036.txt")
+        fmt.Println("stc_kit draw png")
+        fmt.Println("stc_kit -3 .")
 		return
 	}
 	if (os.Args[1] == "-1"){
 		main_data()
     }
 	if (os.Args[1] == "-2"){
-		main_mac()
+		main_mac(1)
+    }
+    if (os.Args[1] == "-3"){
+        arr,_ := main_mac(0)
+        draw_png(arr)
     }
 }
