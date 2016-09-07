@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"net/url"
 	"io/ioutil"
-    "image"
-    "image/color"
-    "image/png"
+	"image"
+	"image/color"
+	"image/png"
 	"bufio"
 	"io"
 	"strings"
@@ -287,6 +287,53 @@ func arr_init(fn string)(arr [] dayvalue, err error) {
     return  arr,err
 }
 
+func averg()(err error){
+      var fname string
+     arg_num := len(os.Args)
+     if (arg_num <= 2 ){
+         fmt.Println("require data file, C:\\php\\600887.txt " )
+         return
+     }else{
+        fname = os.Args[2]
+     }
+
+    f, err := os.Open(fname)//打开文件     
+    defer f.Close() //打开文件出错处理     
+    
+    if nil != err {
+      return err
+    }
+    buff := bufio.NewReader(f) //读入缓存   
+    oday := ""      
+    var sum_value float64 
+    sum_value = 0
+    cnt := 0
+    for {
+        line, err := buff.ReadString('\n') //以'\n'为结束符读入一行    
+        if err != nil || io.EOF == err {
+          break
+        }
+        //fmt.Print(line)  //可以对一行进行处理 
+
+         rets := strings.Split(line," ")
+         if (len(rets)>5) {
+         var t dayvalue
+         t.stockid = rets[0]
+         t.day = rets[1]    
+         
+         if (t.day[0:7] != oday){
+            v,_ :=strconv.ParseFloat(rets[4],3)
+            sum_value = sum_value + v
+            cnt ++
+           //fmt.Println(t.value,t.high);
+            oday = t.day[0:7]
+            fmt.Print(line)
+         }
+        }
+    }
+    fmt.Printf("sum:%.2f cnt:%d avg= %.2f \n",sum_value, cnt , sum_value/float64(cnt))
+    return err
+}
 
 func main_mac(show int)(oarr [] dayvalue, oerr error){
 
@@ -337,10 +384,12 @@ func draw_png(arr [] dayvalue){
     defer imgfile.Close()
     img := image.NewNRGBA(image.Rect(0, 0, dx, dy))
     
- /*   for x := 0; x <= dx; x++ {
-        img.Set(x, dy/2, color.RGBA{uint8(x % 256), uint8(x % 256), 0, 255})
+   for x := 0; x <= dx; x++ {
+       for y := 0; y <= dy; y++ {
+        img.Set(x, y, color.RGBA{20, 20, 20, 255})
+         }   
     }
-    */
+    
     var la,lb,lc int
 
     for index := 0; index < len(arr); index++ {
@@ -355,7 +404,7 @@ func draw_png(arr [] dayvalue){
             drawline((index-1)*zoom,lb,index*zoom,int(ee.Dt)*zoom, func(x, y int) {  
                 img.Set(x,y,color.RGBA{255, 255, 0, 255})}) 
             drawline((index-1)*zoom,lc,index*zoom,int(ee.Jt)*zoom, func(x, y int) {  
-                img.Set(x,y,color.RGBA{0, 255, 0, 255})})  
+                img.Set(x,y,color.RGBA{0, 0, 255, 255})})  
            
         }
         la,lb,lc = int(ee.Kt),int(ee.Dt),int(ee.Jt)
@@ -377,7 +426,7 @@ func main_data() {
 	}
 	stockid :=  os.Args[2]
 	//gethis("600036","2016","2")
-	for n := 2016; n>=2015 ; n-- {
+	for n := 2016; n>= 2012 ; n-- {
 		for m := 4; m>=1; m-- {
 			gethis(stockid,strconv.Itoa(n),strconv.Itoa(m))
 			fmt.Print("\n")
@@ -449,19 +498,24 @@ func main(){
         fmt.Println("stc_kit version 1.0 @2016\n")
 		fmt.Println("stc_kit get data")
 		fmt.Println("stc_kit -1 600036 > 600036.txt")
-		fmt.Println("stc_kit cal mac")
-		fmt.Println("stc_kit -2 600036.txt")
+        fmt.Println("stc_kit average")        
+        fmt.Println("stc_kit -2 600036.txt")
+		fmt.Println("stc_kit cal mac")        
+		fmt.Println("stc_kit -3 600036.txt")
         fmt.Println("stc_kit draw png")
-        fmt.Println("stc_kit -3 .")
+        fmt.Println("stc_kit -4 .")
 		return
 	}
 	if (os.Args[1] == "-1"){
 		main_data()
     }
 	if (os.Args[1] == "-2"){
-		main_mac(1)
+		averg()
     }
     if (os.Args[1] == "-3"){
+        main_mac(1)
+    }
+    if (os.Args[1] == "-4"){
         arr,_ := main_mac(0)
         draw_png(arr)
     }
