@@ -495,7 +495,7 @@ func DrawPolyline(pts []polyclip.Point, brush Putpixel) {
 func main(){
 	todo := len(os.Args)
 	if (todo <= 2 ){
-        fmt.Println("stc_kit version 1.0 @2016\n")
+        fmt.Println("stc_kit version 1.0 @2016.12\n")
 		fmt.Println("stc_kit get data")
 		fmt.Println("stc_kit -1 600036 > 600036.txt")
         fmt.Println("stc_kit average")        
