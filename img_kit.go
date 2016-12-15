@@ -392,7 +392,7 @@ func mergeimgdir(dirpath string, suffix string){
 
 
 func showfunc(){
-	fmt.Println("img_kit v1.0 2016.6 \n\nfunction: ")
+	fmt.Println("img_kit v16.12 2016.12 \n\nfunction: ")
 	fmt.Println("-1 changename")
 	fmt.Println("example: img_kit -1 source.jpg")
 	fmt.Println("-2 watermark")
